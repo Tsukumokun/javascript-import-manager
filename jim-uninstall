@@ -1,0 +1,78 @@
+#
+# JIM - a javascript import manager
+# Copyright (C) 2014 Christopher Kelley   <tsukumokun(at)icloud.com>
+# 
+# This work is licensed under the 
+# Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 
+# International License. To view a copy of this license, visit 
+# http://creativecommons.org/licenses/by-nc-nd/4.0/deed.en_US.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# 
+
+# Enable packaging if desired
+if [[ -z $PREFIX ]]; then PREFIX=/usr/local; fi
+
+# Setup color output if possible
+if [ -t 1 ]; then
+
+    ncolors=$(tput colors)
+
+    if test -n "$ncolors" && test $ncolors -ge 8; then
+        BOLD="$(tput bold)"
+        UNDERLINE="$(tput smul)"
+        STANDOUT="$(tput smso)"
+        NORMAL="$(tput sgr0)"
+        BLACK="$(tput setaf 0)"
+        RED="$(tput setaf 1)"
+        GREEN="$(tput setaf 2)"
+        YELLOW="$(tput setaf 3)"
+        BLUE="$(tput setaf 4)"
+        MAGENTA="$(tput setaf 5)"
+        CYAN="$(tput setaf 6)"
+        WHITE="$(tput setaf 7)"
+    fi
+fi
+
+echo_color()
+{
+    if [ "$#" -lt 1 ]; then
+        echo -n
+    elif [ "$#" -lt 2 ]; then
+        echo $1
+    else
+        echo "${1}${2}${NORMAL}"
+    fi
+}
+
+# Aquire priveledges to uninstall
+echo $BLUE "Uninstalling..."
+sudo echo -n
+
+# Remove executable
+echo $BLUE "Uninstalling executable..."
+sudo rm -f $PREFIX/bin/jim
+# Remove supporting files
+echo $BLUE "Uninstalling supporting files..."
+sudo rm -rf $PREFIX/lib/jim/
+
+echo_color $YELLOW <<EOF
+     gg           ,a8a,  ,ggg, ,ggg,_,ggg,  
+    dP8,         ,8" "8,dP""Y8dP""Y88P""Y8b 
+   dP Yb         d8   8bYb, `88'  `88'  `88 
+  ,8  `8,        88   88 `"  88    88    88 
+  I8   Yb        88   88     88    88    88 
+  `8b, `8,       Y8   8P     88    88    88 
+   `"Y88888      `8, ,8'     88    88    88 
+       "Y8  8888  "8,8"      88    88    88 
+        ,88,`8b,  ,d8b,      88    88    Y8,
+    ,ad88888  "Y88P" "Y8     88    88    `Y8
+  ,dP"'   Yb                                
+ ,8'      I8                                
+,8'       I8                                
+I8,      ,8'                                
+`Y8,___,d8'                                 
+  "Y888P"      ...is now gone. ${RED}:(           
+EOF
