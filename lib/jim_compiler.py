@@ -19,4 +19,4 @@ def _compile_error(message):
     exit(1)
 
 def _compile(in_file,out_file):
-    cacher._cache_get("somefile")
+    cacher._cache_get("somefile",false)

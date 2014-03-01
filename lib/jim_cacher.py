@@ -14,6 +14,7 @@
 
 import json
 import os
+import uuid
 
 def _cache_error(message):
     print("jim: caching error: " + message)
@@ -24,17 +25,38 @@ def _cache_read():
         os.access(os.path.dirname('/var/cache/jim/jim-dependencies.json'), os.W_OK) \
         or _cache_error("cache is not writable, something went wrong")
         with open('/var/cache/jim/jim-dependencies.json', 'wb') as fp:
-            fp.write(json.dumps({'count':0,'files':[ ]}))
+            fp.write(json.dumps({}))
     with open('/var/cache/jim/jim-dependencies.json', 'rb') as fp:
         data = json.load(fp)
     return data
 
-def _cache_get(_file):
+def _cache_store(data,_file):
+    print "Retrieving file: " + _file
+    # Make a uuid name for the new file
+    uuid_name = '/var/cache/jim/'+uuid.uuid4().hex+'.jim_cache'
+    # Attempt to retrieve file and place in cache
+    os.system('curl -# '+_file+' -o '+uuid_name) > 0 \
+    and _cache_error("failed to download file for caching")
+    # Update the file table
+    data['files'][_file] = uuid_name
+    return data
+
+def _cache_restore(_file):
+    # Attempt to retrieve file and place in cache
+    os.system('curl -# '+_file+' -o '+data['files'][_file]) > 0 \
+    and _cache_error("failed to download file for caching")
+
+def _cache_get(_file,force):
     # Read in cache count
     data = _cache_read();
-    print data;
-    # Attempt to retrieve file and place in cache
-    #print "Retrieving file: "+_file
-    #os.system("curl -# -o") > 0 \
-    #and die("minification process failed")
+    # If the file was not found, load it
+    if not _file in data['files']
+        data = _cache_store(data,_file)
+    # If the file was found but told to force, restore the file
+    elif force
+        _cache_restore(_file)
+    # Save new cache data
+    with open('/var/cache/jim/jim-dependencies.json', 'wb') as fp:
+        fp.write(json.dumps(data))
+    return data['files'][_file]
 
