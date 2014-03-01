@@ -1,4 +1,4 @@
-Javascript Import Tool
+Javascript Import Manager (JIM)
 ==========
 
 License
