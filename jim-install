@@ -59,8 +59,54 @@ else
     exit 1
 fi
 
+# Clone repository into temporary file
 echo $BLUE "Retrieving JIM (Javascript-Import-Manager) files..."
-hash git >/dev/null && /usr/bin/env git clone -q https://github.com/Tsukumokun/web-asset-manager.git /tmp/jim || {
+hash git >/dev/null && /usr/bin/env git clone -q https://github.com/Tsukumokun/javascript-import-manager.git /tmp/jim || {
   echo $RED "Not Found: git - install git and retry."
   exit 1
 }
+
+# Aquire priveledges to install
+echo $BLUE "Installing..."
+sudo echo -n
+
+# Install executable file (really just wraps main py file)
+echo $BLUE "Installing executable..."
+sudo mkdir -p $PREFIX/bin/
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sudo install -o root -g wheel -m 755 /tmp/jim/bin/jim $PREFIX/bin/jim
+else
+    sudo install -o root -g root -m 755 /tmp/jim/bin/jim $PREFIX/bin/jim
+fi
+# Install support files
+echo $BLUE "Installing support files..."
+sudo mkdir -p $PREFIX/lib/jim/
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sudo install -o root -g wheel -m 644 /tmp/jim/lib/* $PREFIX/lib/jim/
+else
+    sudo install -o root -g root -m 644 /tmp/jim/lib/* $PREFIX/lib/jim/
+fi
+
+# Remove temporary files associated with git clone
+echo $BLUE "Removing temporary files..."
+rm -rf /tmp/jim/
+
+echo_color $YELLOW <<EOF
+     gg           ,a8a,  ,ggg, ,ggg,_,ggg,  
+    dP8,         ,8" "8,dP""Y8dP""Y88P""Y8b 
+   dP Yb         d8   8bYb, `88'  `88'  `88 
+  ,8  `8,        88   88 `"  88    88    88 
+  I8   Yb        88   88     88    88    88 
+  `8b, `8,       Y8   8P     88    88    88 
+   `"Y88888      `8, ,8'     88    88    88 
+       "Y8  8888  "8,8"      88    88    88 
+        ,88,`8b,  ,d8b,      88    88    Y8,
+    ,ad88888  "Y88P" "Y8     88    88    `Y8
+  ,dP"'   Yb                                
+ ,8'      I8                                
+,8'       I8                                
+I8,      ,8'                                
+`Y8,___,d8'                                 
+  "Y888P"      ...is now installed.         
+EOF
+
