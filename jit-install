@@ -1,0 +1,66 @@
+#
+# WAM - a web asset manager
+# Copyright (C) 2014 Christopher Kelley   <tsukumokun(at)icloud.com>
+# 
+# This work is licensed under the 
+# Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 
+# International License. To view a copy of this license, visit 
+# http://creativecommons.org/licenses/by-nc-nd/4.0/deed.en_US.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# 
+
+# Enable packaging if desired
+if [[ -z $PREFIX ]]; then PREFIX=/usr/local; fi
+
+# Setup color output if possible
+if [ -t 1 ]; then
+
+    ncolors=$(tput colors)
+
+    if test -n "$ncolors" && test $ncolors -ge 8; then
+        BOLD="$(tput bold)"
+        UNDERLINE="$(tput smul)"
+        STANDOUT="$(tput smso)"
+        NORMAL="$(tput sgr0)"
+        BLACK="$(tput setaf 0)"
+        RED="$(tput setaf 1)"
+        GREEN="$(tput setaf 2)"
+        YELLOW="$(tput setaf 3)"
+        BLUE="$(tput setaf 4)"
+        MAGENTA="$(tput setaf 5)"
+        CYAN="$(tput setaf 6)"
+        WHITE="$(tput setaf 7)"
+    fi
+fi
+
+echo_color()
+{
+    if [ "$#" -lt 1 ]; then
+        echo -n
+    elif [ "$#" -lt 2 ]; then
+        echo $1
+    else
+        echo "${1}${2}${NORMAL}"
+    fi
+}
+
+# Program requires java (for yuicompressor)
+# At least version 1.5
+echo_color $BLUE "Searching for java..."
+if type -p java; then
+    _java=java
+elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
+    _java="$JAVA_HOME/bin/java"
+else
+    echo $RED "Not Found: java - install java >v1.5 and retry."
+    exit 1
+fi
+
+echo $BLUE "Retrieving JIM (Javascript-Import-Manager) files..."
+hash git >/dev/null && /usr/bin/env git clone -q https://github.com/Tsukumokun/web-asset-manager.git /tmp/jim || {
+  echo $RED "Not Found: git - install git and retry."
+  exit 1
+}
