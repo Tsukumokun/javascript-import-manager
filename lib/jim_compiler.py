@@ -12,10 +12,11 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # 
 
-import jim_cacher
+import jim_cacher as cacher
 
 def _compile_error(message):
     print("jim: compile error: " + message)
     exit(1)
 
 def _compile(in_file,out_file):
+    cacher._cache_get("somefile")
