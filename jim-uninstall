@@ -47,9 +47,12 @@ echo_color()
     fi
 }
 
-# Aquire priveledges to uninstall
-echo $BLUE "Uninstalling..."
-sudo echo -n
+# Check for root priveledges
+if [ "$(id -u)" != "0" ]; then
+  echo_color $RED "Must have root priveledges to uninstall."
+  echo_color $BLUE "Hint: Run: sudo path/to/jim-uninstall"
+  exit 1
+fi
 
 # Remove executable
 echo $BLUE "Uninstalling executable..."

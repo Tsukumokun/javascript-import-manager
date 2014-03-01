@@ -47,6 +47,13 @@ echo_color()
     fi
 }
 
+# Check for root priveledges
+if [ "$(id -u)" != "0" ]; then
+  echo_color $RED "Must have root priveledges to install."
+  echo_color $BLUE "Hint: Run: sudo path/to/jim-install"
+  exit 1
+fi
+
 # Program requires java (for yuicompressor)
 # At least version 1.5
 echo_color $BLUE "Searching for java..."
@@ -66,25 +73,23 @@ hash git >/dev/null && /usr/bin/env git clone -q https://github.com/Tsukumokun/j
   exit 1
 }
 
-# Aquire priveledges to install
-echo $BLUE "Installing..."
-sudo echo -n
-
 # Install executable file (really just wraps main py file)
 echo $BLUE "Installing executable..."
-sudo mkdir -p $PREFIX/bin/
+mkdir -p $PREFIX/bin/
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    sudo install -o root -g wheel -m 755 /tmp/jim/bin/jim $PREFIX/bin/jim
+    install -o root -g wheel -m 755 /tmp/jim/bin/jim $PREFIX/bin/jim
 else
-    sudo install -o root -g root -m 755 /tmp/jim/bin/jim $PREFIX/bin/jim
+    install -o root -g root -m 755 /tmp/jim/bin/jim $PREFIX/bin/jim
 fi
+# Prepare executable file with given prefix
+echo "python ${PREFIX}/lib/jim/jim.py $@\n\n" >> $PREFIX/bin/jim
 # Install support files
 echo $BLUE "Installing support files..."
-sudo mkdir -p $PREFIX/lib/jim/
+mkdir -p $PREFIX/lib/jim/
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    sudo install -o root -g wheel -m 644 /tmp/jim/lib/* $PREFIX/lib/jim/
+    install -o root -g wheel -m 644 /tmp/jim/lib/* $PREFIX/lib/jim/
 else
-    sudo install -o root -g root -m 644 /tmp/jim/lib/* $PREFIX/lib/jim/
+    install -o root -g root -m 644 /tmp/jim/lib/* $PREFIX/lib/jim/
 fi
 
 # Remove temporary files associated with git clone
