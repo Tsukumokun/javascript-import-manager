@@ -96,22 +96,22 @@ fi
 echo $BLUE "Removing temporary files..."
 rm -rf /tmp/jim/
 
-echo_color $YELLOW <<EOF
-     gg           ,a8a,  ,ggg, ,ggg,_,ggg,  
-    dP8,         ,8" "8,dP""Y8dP""Y88P""Y8b 
-   dP Yb         d8   8bYb, `88'  `88'  `88 
-  ,8  `8,        88   88 `"  88    88    88 
-  I8   Yb        88   88     88    88    88 
-  `8b, `8,       Y8   8P     88    88    88 
-   `"Y88888      `8, ,8'     88    88    88 
-       "Y8  8888  "8,8"      88    88    88 
-        ,88,`8b,  ,d8b,      88    88    Y8,
-    ,ad88888  "Y88P" "Y8     88    88    `Y8
-  ,dP"'   Yb                                
- ,8'      I8                                
-,8'       I8                                
-I8,      ,8'                                
-`Y8,___,d8'                                 
-  "Y888P"      ...is now installed.         
-EOF
+echo_color $YELLOW "
+     gg           ,a8a,  ,ggg, ,ggg,_,ggg,
+    dP8,         ,8\" \"8,dP\"\"Y8dP\"\"Y88P\"\"Y8b
+   dP Yb         d8   8bYb, \`88'  \`88'  \`88
+  ,8  \`8,        88   88 \`\"  88    88    88
+  I8   Yb        88   88     88    88    88
+  \`8b, \`8,       Y8   8P     88    88    88
+   \`\"Y88888      \`8, ,8'     88    88    88
+       \"Y8  8888  \"8,8\"      88    88    88
+        ,88,\`8b,  ,d8b,      88    88    Y8,
+    ,ad88888  \"Y88P\" \"Y8     88    88    \`Y8
+  ,dP\"'   Yb
+ ,8'      I8
+,8'       I8      ...is now installed.
+I8,      ,8'
+\`Y8,___,d8'
+  \"Y888P\"
+"
 
