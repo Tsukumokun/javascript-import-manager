@@ -20,7 +20,9 @@ def _cache_error(message):
     exit(1)
 
 def _cache_read():
-    if not os.path.exists('/var/cache/jim/jim-dependencies.json')
+    if not os.path.exists('/var/cache/jim/jim-dependencies.json'):
+        os.access(os.path.dirname('/var/cache/jim/jim-dependencies.json'), os.W_OK) \
+        or _cache_error("cache is not writable, something went wrong")
         with open('/var/cache/jim/jim-dependencies.json', 'wb') as fp:
             fp.write(json.dumps({'count':0,'files':[ ]}))
     with open('/var/cache/jim/jim-dependencies.json', 'rb') as fp:

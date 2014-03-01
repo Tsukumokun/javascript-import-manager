@@ -56,16 +56,16 @@ if args.output != None:
         # Add an input file variation to it
         if args.no_minify:
             dest += fileName + ".o." + fileExtension
-        else
+        else:
             dest += fileName + ".min." + fileExtension
 # If not, add an input file variation to the cwd
-else
+else:
     if args.no_minify:
         dest += fileName + ".o." + fileExtension
-    else
+    else:
         dest += fileName + ".min." + fileExtension
 # Check if the new file location is writable
-os.access(os.path.dirname(args.dest), os.W_OK) or die("destination is not writable")
+os.access(os.path.dirname(dest), os.W_OK) or die("destination is not writable")
 # Now ensure all directories to that file exist
 if not os.path.exists(dest):
     os.makedirs(dest)

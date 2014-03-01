@@ -93,6 +93,7 @@ else
 fi
 echo $BLUE "Building cache directory"
 mkdir -p /var/cache/jim/
+chmod 777 /var/cache/jim/
 
 # Remove temporary files associated with git clone
 echo $BLUE "Removing temporary files..."
