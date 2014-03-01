@@ -91,6 +91,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
     install -o root -g root -m 644 /tmp/jim/lib/* $PREFIX/lib/jim/
 fi
+echo $BLUE "Building cache directory"
+mkdir -p /var/cache/jim/
 
 # Remove temporary files associated with git clone
 echo $BLUE "Removing temporary files..."

@@ -60,6 +60,9 @@ sudo rm -f $PREFIX/bin/jim
 # Remove supporting files
 echo $BLUE "Uninstalling supporting files..."
 sudo rm -rf $PREFIX/lib/jim/
+# Remove cached files
+echo $BLUE "Removing cached files..."
+sudo rm -rf /var/cache/jim/
 
 echo_color $YELLOW "
      gg           ,a8a,  ,ggg, ,ggg,_,ggg,
