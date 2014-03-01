@@ -17,6 +17,8 @@ import fileinput
 import os
 import re
 
+import jim_compiler
+
 def die(message):
     print("jim: error: " + message)
     exit(1)
@@ -71,5 +73,6 @@ if not os.path.exists(dest):
 def _minify(_file):
     os.system("java -jar "+os.path.dirname(os.path.realpath(__file__))+'/yuicompressor.jar --type js '+_file+' -o '+_file) > 0 \
     and die("minification process failed")
+
 
 
