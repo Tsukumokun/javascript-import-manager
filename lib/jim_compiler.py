@@ -19,4 +19,4 @@ def _compile_error(message):
     exit(1)
 
 def _compile(in_file,out_file):
-    cacher._cache_get("somefile",false)
+    cacher._cache_get("https://raw.github.com/Tsukumokun/javascript-import-manager/master/README.md",False)

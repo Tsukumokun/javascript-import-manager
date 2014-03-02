@@ -31,32 +31,33 @@ def _cache_read():
     return data
 
 def _cache_store(data,_file):
-    print "Retrieving file: " + _file
+    print "No cache found, retrieving file: " + _file
     # Make a uuid name for the new file
     uuid_name = '/var/cache/jim/'+uuid.uuid4().hex+'.jim_cache'
     # Attempt to retrieve file and place in cache
     os.system('curl -# '+_file+' -o '+uuid_name) > 0 \
     and _cache_error("failed to download file for caching")
     # Update the file table
-    data['files'][_file] = uuid_name
+    data[_file] = uuid_name
     return data
 
 def _cache_restore(_file):
+    print "Forced rebuild, retrieving file: " + _file
     # Attempt to retrieve file and place in cache
-    os.system('curl -# '+_file+' -o '+data['files'][_file]) > 0 \
+    os.system('curl -# '+_file+' -o '+data[_file]) > 0 \
     and _cache_error("failed to download file for caching")
 
 def _cache_get(_file,force):
     # Read in cache count
-    data = _cache_read();
+    data = _cache_read()
     # If the file was not found, load it
-    if not _file in data['files']
+    if not _file in data:
         data = _cache_store(data,_file)
     # If the file was found but told to force, restore the file
-    elif force
+    elif force:
         _cache_restore(_file)
     # Save new cache data
     with open('/var/cache/jim/jim-dependencies.json', 'wb') as fp:
         fp.write(json.dumps(data))
-    return data['files'][_file]
+    return data[_file]
 
