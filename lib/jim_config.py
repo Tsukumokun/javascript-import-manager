@@ -15,8 +15,15 @@
 import os
 import json
 
+truth = ['true', 't', 'True', 'T', 'on', 'yes', 'y']
+#lies  = ['false', 'f', 'False', 'F', 'off', 'no', 'n']
+toggle = ['toggle', 'Toggle']
+
 def _global_name():
     return '/var/cache/jim/jim-configuration.json'
+
+def _global_default():
+    return {"nocache":False,"nominify":False}
 
 def _global_error(message):
     print("jim: global error: " + message)
@@ -31,10 +38,7 @@ def _global_ensure():
         or _cache_error("configuration is not writable, something went wrong")
         # Dump a default json object into the file
         with open(_file, 'wb') as fp:
-            fp.write(json.dumps({
-                "nocache":False,
-                "nominify":False
-            }))
+            fp.write(json.dumps(_global_default() ) )
 
 # Returns the globals as an associative array
 def _global_read():
@@ -51,13 +55,36 @@ def _global_write(data):
 
 # Sets a global setting variable
 def _global_set_setting(setting,value):
+    if value in toggle:
+        _global_toggle_setting(setting)
+        return
     data = _global_read()
-    data[setting] = bool(value)
-    _global_write(data)
+    if setting in data:
+        data[setting] = value in truth
+        _global_write(data)
+    else:
+        _global_error("setting "+setting+" not found")
 
 # Toggles a global setting variable
 def _global_toggle_setting(setting):
     data = _global_read()
-    data[settting] = not data[setting]
-    _global_write(data)
+    if setting in data:
+        data[setting] = not data[setting]
+        _global_write(data)
+    else:
+        _global_error("setting "+setting+" not found")
 
+# Gets a global setting variable
+def _global_get_setting(setting):
+    data = _global_read()
+    if setting in data:
+        return data[setting]
+
+# Resets a global setting variable
+def _global_reset_setting(setting):
+    data = _global_read()
+    if setting in data:
+        data[setting] = _global_default()[setting]
+        _global_write(data)
+    else:
+        _global_error("setting "+setting+" not found")

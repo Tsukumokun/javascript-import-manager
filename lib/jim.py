@@ -13,36 +13,68 @@
 # 
 
 import argparse
+import sys
+
+##SHOULD REMOVE
 import fileinput
 import os
 import re
 
-import jim_compiler as compiler
+
+import jim_dispatcher as dispatcher
 
 def die(message):
     print("jim: error: " + message)
     exit(1)
 
 parser = argparse.ArgumentParser(prog="jim",description='Javascript Import Manager')
-parser.add_argument('file', type=str,
-                   help='a file for the compiler', nargs="?")
-parser.add_argument('-M', '--no-minify', dest='no_minify', action='store_true',
-                   default=False,
-                   help='do not minify, only compile the file')
-parser.add_argument('-r', '--rebuild', dest='rebuild', action='store_true',
-                   default=False,
-                   help='forces a rebuild of the local caches - note: if used with '+
-                   'a file this will only rebiuld the associated files, if used '+
-                   'alone this will rebuild the entire cache')
-parser.add_argument('-c', '--clear-cache', dest='clear', action='store_true',
-                   default=False,
-                   help='removes all of the local caches - note: if used with '+
-                   'a file this will rebiuld the associated files, if used '+
-                   'alone this will only empty the cache')
-parser.add_argument('-o', '--output', metavar='output', dest='output', type=str,
-                   help='destination to output to, may be a file or directory')
+sp = parser.add_subparsers()
 
+# Sub parser for configuration
+sp_config = sp.add_parser('config', help='manage configuration')
+mgroup = sp_config.add_mutually_exclusive_group(required=True)
+mgroup.add_argument('--global', type=str, dest='config_global',
+                        help='use global config file', nargs=2,
+                        metavar=('name','value'))
+mgroup.add_argument('--get', type=str, dest='config_get',
+                        help='get value: name', nargs=1,
+                        metavar='name')
+mgroup.add_argument('--reset', type=str, dest='config_reset',
+                        help='reset value: name', nargs=1,
+                        metavar='name')
+sp_config.set_defaults(which="config")
+
+sp_cache = sp.add_parser('cache', help='manage cache')
+mgroup = sp_cache.add_mutually_exclusive_group(required=True)
+mgroup.add_argument('--clear', dest='cache_clear', action='store_true',
+                        default=False, help='clear the cache')
+mgroup.add_argument('--rebuild', dest='cache_rebuild', action='store_true',
+                        default=False, help='rebuild the cache')
+sp_cache.set_defaults(which="cache")
+
+sp_make = sp.add_parser('make', help='compile a file')
+sp_make.add_argument('file', type=str,
+                   help='a file for the compiler', nargs="?")
+sp_make.add_argument('-M', '--no-minify', dest='no_minify', action='store_true',
+                   default=False,
+                   help='do not minify, overrides global')
+sp_make.add_argument('-C', '--no-cache', dest='no_cache', action='store_true',
+                   default=False,
+                   help='do not cache, overrides global')
+sp_make.add_argument('-o', '--output', metavar='output', dest='output', type=str,
+                   help='destination to output to, may be a file or directory')
+sp_make.set_defaults(which="make")
+
+# Set default subparser
+if  sys.argv[1] != 'config' and \
+    sys.argv[1] != 'cache' and  \
+    sys.argv[1] != 'make':
+        sys.argv.insert(1,'make')
 args = parser.parse_args()
+
+dispatcher._dispatcher_dispatch(args)
+
+exit(0)
 
 if args.file == None:
     if args.rebuild:

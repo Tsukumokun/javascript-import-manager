@@ -16,7 +16,7 @@ import os
 import re
 from sets import Set
 
-import jim_cacher as cacher
+import jim_cache as cacher
 
 repeat_set = Set();
 
