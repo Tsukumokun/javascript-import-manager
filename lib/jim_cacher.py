@@ -70,3 +70,10 @@ def _cache_rebuild():
     # Restore every file in the cache
     for _file in data:
         _cache_restore(_file,data[_file])
+
+def _cache_clear():
+    folder = '/var/cache/jim/'
+    for _file in os.listdir(folder):
+        file_path = os.path.join(folder,_file)
+        if os.path.isfile(file_path):
+            os.unlink(file_path)

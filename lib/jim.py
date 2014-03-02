@@ -34,6 +34,11 @@ parser.add_argument('-r', '--rebuild', dest='rebuild', action='store_true',
                    help='forces a rebuild of the local caches - note: if used with '+
                    'a file this will only rebiuld the associated files, if used '+
                    'alone this will rebuild the entire cache')
+parser.add_argument('-c', '--clear-cache', dest='clear', action='store_true',
+                   default=False,
+                   help='removes all of the local caches - note: if used with '+
+                   'a file this will rebiuld the associated files, if used '+
+                   'alone this will only empty the cache')
 parser.add_argument('-o', '--output', metavar='output', dest='output', type=str,
                    help='destination to output to, may be a file or directory')
 
@@ -42,9 +47,13 @@ args = parser.parse_args()
 if args.file == None:
     if args.rebuild:
         compiler._compile_rebuild()
-        exit(0)
+    elif args.clear:
+        compiler._compile_clearcache()
     else:
         die("no file specified, and rebuild not requested")
+    exit(0)
+if args.clear:
+    compiler._compile_clearcache()
 
 #Set up where the file should go, will be saved to dest
 dest = os.getcwd()+"/"

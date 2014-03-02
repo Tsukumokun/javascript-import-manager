@@ -65,4 +65,6 @@ def _compile(in_file,out_file,force):
 
 def _compile_rebuild():
     cacher._cache_rebuild()
+def _compile_clearcache():
+    cacher._cache_clear()
 
