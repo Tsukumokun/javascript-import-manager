@@ -82,7 +82,8 @@ else
     install -o root -g root -m 755 /tmp/jim/bin/jim $PREFIX/bin/jim
 fi
 # Prepare executable file with given prefix
-echo "python ${PREFIX}/lib/jim/jim.py $@\n\n" >> $PREFIX/bin/jim
+echo "python ${PREFIX}/lib/jim/jim.py \$@" >> $PREFIX/bin/jim
+echo >> $PREFIX/bin/jim
 # Install support files
 echo $BLUE "Installing support files..."
 mkdir -p $PREFIX/lib/jim/
