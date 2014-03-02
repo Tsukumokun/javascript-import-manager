@@ -25,7 +25,7 @@ def die(message):
 
 parser = argparse.ArgumentParser(prog="jim",description='Javascript Import Manager')
 parser.add_argument('file', type=str,
-                   help='a file for the compiler')
+                   help='a file for the compiler', nargs="?")
 parser.add_argument('-M', '--no-minify', dest='no_minify', action='store_true',
                    default=False,
                    help='do not minify, only compile the file')
@@ -39,6 +39,11 @@ parser.add_argument('-o', '--output', metavar='output', dest='output', type=str,
 
 args = parser.parse_args()
 
+if args.file == None:
+    if args.rebuild:
+        compiler._compile_rebuild()
+    else
+        die("no file specified, and rebuild not requestedS")
 
 #Set up where the file should go, will be saved to dest
 dest = os.getcwd()
@@ -74,5 +79,5 @@ def _minify(_file):
     os.system("java -jar "+os.path.dirname(os.path.realpath(__file__))+'/yuicompressor.jar --type js '+_file+' -o '+_file) > 0 \
     and die("minification process failed")
 
-compiler._compile("dnm","test")
+compiler._compile(args.file,dest,args.rebuild)
 

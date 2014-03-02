@@ -12,11 +12,36 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # 
 
+import re
+
 import jim_cacher as cacher
 
 def _compile_error(message):
     print("jim: compile error: " + message)
     exit(1)
 
-def _compile(in_file,out_file):
-    cacher._cache_get("https://raw.github.com/Tsukumokun/javascript-import-manager/master/README.md",False)
+def _compile_import(line):
+    vals = re.match("^[ ]*(//|/\*|\*)?[ ]*@[a-zA-Z]+( *?\((['](?P<f>([^']|\\')+)[']|[\"](?P<g>([^\"]|\\\")+)[\"]|(?P<h>([^\()'\"]|\\\"|\\')+))[\)]| +(['](?P<i>([^']|\\')+)[']|[\"](?P<j>([^\"]|\\\")+)[\"])) *$",line).groupdict().values()
+    for val in vals:
+        if val != None:
+            return val
+    _compile_error("import syntax error: "+line)
+
+def _compile_recurse(in_file,out_fd,force):
+    if not os.path.isfile(in_file):
+        in_file = cacher._cache_get(in_file,force)
+    with open(in_file, 'r') as fp:
+        data = fp.read()
+    for line in data
+        if line.find("@import") < 0:
+            out_fd.write(line)
+        else:
+           _compile_recurse(_compile_check_import(line),out_fd,force)
+
+def _compile(in_file,out_file,force):
+    with open(out_file, 'w') as fp:
+        _compile_recurse(in_file,fp,force)
+
+def _compile_rebuild():
+    cacher._cache_rebuild()
+

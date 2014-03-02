@@ -48,7 +48,7 @@ def _cache_restore(_file):
     and _cache_error("failed to download file for caching")
 
 def _cache_get(_file,force):
-    # Read in cache count
+    # Read in cache data
     data = _cache_read()
     # If the file was not found, load it
     if not _file in data:
@@ -61,3 +61,9 @@ def _cache_get(_file,force):
         fp.write(json.dumps(data))
     return data[_file]
 
+def _cache_rebuild():
+    # Read in cache data
+    data = _cache_read()
+    # Restore every file in the cache
+    for _file in data:
+        _cache_restore(_file)
