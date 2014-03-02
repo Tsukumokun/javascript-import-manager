@@ -42,11 +42,12 @@ args = parser.parse_args()
 if args.file == None:
     if args.rebuild:
         compiler._compile_rebuild()
-    else
-        die("no file specified, and rebuild not requestedS")
+        exit(0)
+    else:
+        die("no file specified, and rebuild not requested")
 
 #Set up where the file should go, will be saved to dest
-dest = os.getcwd()
+dest = os.getcwd()+"/"
 fileName, fileExtension = os.path.splitext(args.file)
 # If output is specified make it the destination file
 if args.output != None:
@@ -60,20 +61,24 @@ if args.output != None:
     if os.path.isdir(dest):
         # Add an input file variation to it
         if args.no_minify:
-            dest += fileName + ".o." + fileExtension
+            dest += fileName + ".o"
         else:
-            dest += fileName + ".min." + fileExtension
+            dest += fileName + ".min"
+        if fileExtension != "":
+            dest += fileExtension
 # If not, add an input file variation to the cwd
 else:
     if args.no_minify:
-        dest += fileName + ".o." + fileExtension
+        dest += fileName + ".o"
     else:
-        dest += fileName + ".min." + fileExtension
+        dest += fileName + ".min"
+    if fileExtension != "":
+            dest += fileExtension
 # Check if the new file location is writable
 os.access(os.path.dirname(dest), os.W_OK) or die("destination is not writable")
 # Now ensure all directories to that file exist
-if not os.path.exists(dest):
-    os.makedirs(dest)
+if not os.path.exists(os.path.dirname(dest)):
+    os.makedirs(os.path.dirname(dest))
 
 def _minify(_file):
     os.system("java -jar "+os.path.dirname(os.path.realpath(__file__))+'/yuicompressor.jar --type js '+_file+' -o '+_file) > 0 \

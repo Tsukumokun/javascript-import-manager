@@ -12,6 +12,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # 
 
+import os
 import re
 
 import jim_cacher as cacher
@@ -32,11 +33,11 @@ def _compile_recurse(in_file,out_fd,force):
         in_file = cacher._cache_get(in_file,force)
     with open(in_file, 'r') as fp:
         data = fp.read()
-    for line in data
+    for line in data.split('\n'):
         if line.find("@import") < 0:
-            out_fd.write(line)
+            out_fd.write(line+"\n")
         else:
-           _compile_recurse(_compile_check_import(line),out_fd,force)
+           _compile_recurse(_compile_import(line),out_fd,force)
 
 def _compile(in_file,out_file,force):
     with open(out_file, 'w') as fp:

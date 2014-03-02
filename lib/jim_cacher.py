@@ -41,10 +41,10 @@ def _cache_store(data,_file):
     data[_file] = uuid_name
     return data
 
-def _cache_restore(_file):
-    print "Forced rebuild, retrieving file: " + _file
+def _cache_restore(remote_file,cached_file):
+    print "Forced rebuild, retrieving file: " + remote_file
     # Attempt to retrieve file and place in cache
-    os.system('curl -# '+_file+' -o '+data[_file]) > 0 \
+    os.system('curl -# '+remote_file+' -o '+cached_file) > 0 \
     and _cache_error("failed to download file for caching")
 
 def _cache_get(_file,force):
@@ -66,4 +66,4 @@ def _cache_rebuild():
     data = _cache_read()
     # Restore every file in the cache
     for _file in data:
-        _cache_restore(_file)
+        _cache_restore(_file,data[_file])
