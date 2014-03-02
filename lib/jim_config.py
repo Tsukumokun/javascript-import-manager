@@ -35,7 +35,7 @@ def _global_ensure():
     # If there is no configuration file create one
     if not os.path.exists(_file):
         os.access(os.path.dirname(_file), os.W_OK) \
-        or _cache_error("configuration is not writable, something went wrong")
+        or _global_error("configuration is not writable, something went wrong")
         # Dump a default json object into the file
         with open(_file, 'wb') as fp:
             fp.write(json.dumps(_global_default() ) )
