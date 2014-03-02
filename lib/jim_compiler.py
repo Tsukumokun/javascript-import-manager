@@ -14,8 +14,11 @@
 
 import os
 import re
+from sets import Set
 
 import jim_cacher as cacher
+
+repeat_set = Set();
 
 def _compile_error(message):
     print("jim: compile error: " + message)
@@ -28,20 +31,37 @@ def _compile_import(line):
             return val
     _compile_error("import syntax error: "+line)
 
-def _compile_recurse(in_file,out_fd,force):
+def _compile_recurse(in_file,out_fd,force,loop_set):
+    if in_file in loop_set:
+        error = "dependency loop encountered"
+        for f in loop_set:
+            error += "\n\t"+f
+        error += "\n\t"+in_file
+        _compile_error(error)
+    else:
+        loop_set.add(in_file)
+    if in_file in repeat_set:
+        return
+    else:
+        repeat_set.add(in_file)
     if not os.path.isfile(in_file):
         in_file = cacher._cache_get(in_file,force)
+    out_fd.write("//File: "+in_file+"\n")
     with open(in_file, 'r') as fp:
         data = fp.read()
     for line in data.split('\n'):
         if line.find("@import") < 0:
             out_fd.write(line+"\n")
         else:
-           _compile_recurse(_compile_import(line),out_fd,force)
+            nset = Set()
+            nset.update(loop_set)
+            _compile_recurse(_compile_import(line),out_fd,force,nset)
+    out_fd.write("//End File: "+in_file+"\n")
 
 def _compile(in_file,out_file,force):
+    repeat_set = Set()
     with open(out_file, 'w') as fp:
-        _compile_recurse(in_file,fp,force)
+        _compile_recurse(in_file,fp,force,Set())
 
 def _compile_rebuild():
     cacher._cache_rebuild()

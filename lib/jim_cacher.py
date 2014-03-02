@@ -21,11 +21,14 @@ def _cache_error(message):
     exit(1)
 
 def _cache_read():
+    # If there is no dependencies file create one
     if not os.path.exists('/var/cache/jim/jim-dependencies.json'):
         os.access(os.path.dirname('/var/cache/jim/jim-dependencies.json'), os.W_OK) \
         or _cache_error("cache is not writable, something went wrong")
+        # Dump a blank json object into the file
         with open('/var/cache/jim/jim-dependencies.json', 'wb') as fp:
             fp.write(json.dumps({}))
+    # Load the file into data and return it
     with open('/var/cache/jim/jim-dependencies.json', 'rb') as fp:
         data = json.load(fp)
     return data
