@@ -24,10 +24,10 @@ import re
 import jim_dispatcher as dispatcher
 
 def die(message):
-    print("jim: error: " + message)
+    print('jim: error: ' + message)
     exit(1)
 
-parser = argparse.ArgumentParser(prog="jim",description='Javascript Import Manager')
+parser = argparse.ArgumentParser(prog='jim',description='Javascript Import Manager')
 sp = parser.add_subparsers()
 
 # Sub parser for configuration
@@ -42,7 +42,7 @@ mgroup.add_argument('--get', type=str, dest='config_get',
 mgroup.add_argument('--reset', type=str, dest='config_reset',
                         help='reset value: name', nargs=1,
                         metavar='name')
-sp_config.set_defaults(which="config")
+sp_config.set_defaults(which='config')
 
 sp_cache = sp.add_parser('cache', help='manage cache')
 mgroup = sp_cache.add_mutually_exclusive_group(required=True)
@@ -56,11 +56,11 @@ mgroup.add_argument('--add', dest='cache_add', type=str,
                         nargs=1, metavar='file', help='add a remote file to the cache')
 mgroup.add_argument('--remove', dest='cache_remove', type=str,
                         nargs=1, metavar='file', help='remove a remote file from to the cache')
-sp_cache.set_defaults(which="cache")
+sp_cache.set_defaults(which='cache')
 
 sp_make = sp.add_parser('make', help='compile a file')
 sp_make.add_argument('file', type=str,
-                   help='a file for the compiler', nargs="?")
+                   help='a file for the compiler')
 sp_make.add_argument('-M', '--no-minify', dest='no_minify', action='store_true',
                    default=False,
                    help='do not minify, overrides global')
@@ -69,12 +69,13 @@ sp_make.add_argument('-C', '--no-cache', dest='no_cache', action='store_true',
                    help='do not cache, overrides global')
 sp_make.add_argument('-o', '--output', metavar='output', dest='output', type=str,
                    help='destination to output to, may be a file or directory')
-sp_make.set_defaults(which="make")
+sp_make.set_defaults(which='make')
 
 # Set default subparser
 if  sys.argv[1] != 'config' and \
     sys.argv[1] != 'cache' and  \
-    sys.argv[1] != 'make':
+    sys.argv[1] != 'make' and \
+    not sys.argv[1].startswith('-'):
         sys.argv.insert(1,'make')
 args = parser.parse_args()
 
@@ -82,19 +83,9 @@ dispatcher._dispatcher_dispatch(args)
 
 exit(0)
 
-if args.file == None:
-    if args.rebuild:
-        compiler._compile_rebuild()
-    elif args.clear:
-        compiler._compile_clearcache()
-    else:
-        die("no file specified, and rebuild not requested")
-    exit(0)
-if args.clear:
-    compiler._compile_clearcache()
 
 #Set up where the file should go, will be saved to dest
-dest = os.getcwd()+"/"
+dest = os.getcwd()+'/'
 fileName, fileExtension = os.path.splitext(args.file)
 # If output is specified make it the destination file
 if args.output != None:
@@ -108,28 +99,26 @@ if args.output != None:
     if os.path.isdir(dest):
         # Add an input file variation to it
         if args.no_minify:
-            dest += fileName + ".o"
+            dest += fileName + '.o'
         else:
-            dest += fileName + ".min"
-        if fileExtension != "":
+            dest += fileName + '.min'
+        if fileExtension != '':
             dest += fileExtension
 # If not, add an input file variation to the cwd
 else:
     if args.no_minify:
-        dest += fileName + ".o"
+        dest += fileName + '.o'
     else:
-        dest += fileName + ".min"
-    if fileExtension != "":
+        dest += fileName + '.min'
+    if fileExtension != '':
             dest += fileExtension
 # Check if the new file location is writable
-os.access(os.path.dirname(dest), os.W_OK) or die("destination is not writable")
+os.access(os.path.dirname(dest), os.W_OK) or die('destination is not writable')
 # Now ensure all directories to that file exist
 if not os.path.exists(os.path.dirname(dest)):
     os.makedirs(os.path.dirname(dest))
 
-def _minify(_file):
-    os.system("java -jar "+os.path.dirname(os.path.realpath(__file__))+'/yuicompressor.jar --type js '+_file+' -o '+_file) > 0 \
-    and die("minification process failed")
+
 
 compiler._compile(args.file,dest,args.rebuild)
 

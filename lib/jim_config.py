@@ -23,10 +23,10 @@ def _global_name():
     return '/var/cache/jim/jim-configuration.json'
 
 def _global_default():
-    return {"nocache":False,"nominify":False}
+    return {'nocache':False,'nominify':False}
 
 def _global_error(message):
-    print("jim: global error: " + message)
+    print('jim: global error: ' + message)
     exit(1)
 
 # Ensures the globals file is present
@@ -35,7 +35,7 @@ def _global_ensure():
     # If there is no configuration file create one
     if not os.path.exists(_file):
         os.access(os.path.dirname(_file), os.W_OK) \
-        or _global_error("configuration is not writable, something went wrong")
+        or _global_error('configuration is not writable, something went wrong')
         # Dump a default json object into the file
         with open(_file, 'wb') as fp:
             fp.write(json.dumps(_global_default() ) )
@@ -63,7 +63,7 @@ def _global_set_setting(setting,value):
         data[setting] = value in truth
         _global_write(data)
     else:
-        _global_error("setting "+setting+" not found")
+        _global_error('setting '+setting+' not found')
 
 # Toggles a global setting variable
 def _global_toggle_setting(setting):
@@ -72,7 +72,7 @@ def _global_toggle_setting(setting):
         data[setting] = not data[setting]
         _global_write(data)
     else:
-        _global_error("setting "+setting+" not found")
+        _global_error('setting '+setting+' not found')
 
 # Gets a global setting variable
 def _global_get_setting(setting):
@@ -87,4 +87,4 @@ def _global_reset_setting(setting):
         data[setting] = _global_default()[setting]
         _global_write(data)
     else:
-        _global_error("setting "+setting+" not found")
+        _global_error('setting '+setting+' not found')

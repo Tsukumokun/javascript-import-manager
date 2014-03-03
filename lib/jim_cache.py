@@ -25,7 +25,7 @@ def _cache_default():
     return {}
 
 def _cache_error(message):
-    print("jim: caching error: " + message)
+    print('jim: caching error: ' + message)
     exit(1)
 
 # Ensures the cache file is present
@@ -34,7 +34,7 @@ def _cache_ensure():
     # If there is no configuration file create one
     if not os.path.exists(_file):
         os.access(os.path.dirname(_file), os.W_OK) \
-        or _cache_error("cache is not writable, something went wrong")
+        or _cache_error('cache is not writable, something went wrong')
         # Dump a default json object into the file
         with open(_file, 'wb') as fp:
             fp.write(json.dumps(_cache_default() ) )
@@ -54,22 +54,22 @@ def _cache_write(data):
 
 # Stores a file in the cache
 def _cache_store(data,_file):
-    print "no cache found, retrieving file: " + _file
+    print 'no cache found, retrieving file: ' + _file
     # Make a uuid name for the new file
     uuid_name = '/var/cache/jim/'+uuid.uuid4().hex+'.jim_cache'
     # Attempt to retrieve file and place in cache
     os.system('curl -# '+_file+' -o '+uuid_name) > 0 \
-    and _cache_error("failed to download file for caching")
+    and _cache_error('failed to download file for caching')
     # Update the file table
     data[_file] = uuid_name
     return data
 
 # Restores a file in the cache, file must have been stored already
 def _cache_restore(remote_file,cached_file):
-    print "forced rebuild, retrieving file: " + remote_file
+    print 'forced rebuild, retrieving file: ' + remote_file
     # Attempt to retrieve file and place in cache
     os.system('curl -# '+remote_file+' -o '+cached_file) > 0 \
-    and _cache_error("failed to download file for caching")
+    and _cache_error('failed to download file for caching')
 
 # Gets a file name from the cache
 def _cache_get(_file,force):
@@ -92,7 +92,7 @@ def _cache_rebuild():
     # Restore every file in the cache
     for _file in data:
         _cache_restore(_file,data[_file])
-    print "cache was rebuilt"
+    print 'cache was rebuilt'
 
 # Clears the entire cache
 def _cache_clear():
@@ -102,7 +102,7 @@ def _cache_clear():
             file_path = os.path.join(folder,_file)
             if os.path.isfile(file_path):
                 os.unlink(file_path)
-    print "cache was cleared"
+    print 'cache was cleared'
 
 # Adds a specific file to the cache
 def _cache_add(_file):
@@ -113,13 +113,13 @@ def _cache_remove(_file):
     # Read in cache data
     data = _cache_read()
     if not _file in data:
-        print "file not found in cache"
+        print 'file not found in cache'
         return
     os.unlink(data[_file])
     del data[_file]
     # Save new cache data
     _cache_write(data)
-    print "file removed from cache"
+    print 'file removed from cache'
 
 # Lists all files in the cache
 def _cache_list():
