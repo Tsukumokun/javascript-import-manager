@@ -88,3 +88,9 @@ def _global_reset_setting(setting):
         _global_write(data)
     else:
         _global_error('setting '+setting+' not found')
+
+def _global_list_settings():
+    data = _global_read()
+    print json.dumps(data,sort_keys=True,
+        indent=4, separators=(',', ': '))
+

@@ -31,7 +31,9 @@ def _dispatcher_dispatch(args):
 
 # Dispatch to configuration
 def _dispatcher_config(args):
-    if args.config_get != None:
+    if args.config_list:
+        config._global_list_settings()
+    elif args.config_get != None:
         print config._global_get_setting(args.config_get[0])
     elif args.config_global != None:
         config._global_set_setting(args.config_global[0],args.config_global[1])
@@ -95,6 +97,4 @@ def _dispatcher_make(args):
     compiler._compile_make(args.file,dest,args.rebuild,nocache)
     if not nominify:
         compiler._compile_minify(dest)
-
-
 

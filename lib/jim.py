@@ -15,12 +15,6 @@
 import argparse
 import sys
 
-##SHOULD REMOVE
-import fileinput
-import os
-import re
-
-
 import jim_dispatcher as dispatcher
 
 def die(message):
@@ -36,6 +30,8 @@ mgroup = sp_config.add_mutually_exclusive_group(required=True)
 mgroup.add_argument('--global', type=str, dest='config_global',
                         help='use global config file', nargs=2,
                         metavar=('name','value'))
+mgroup.add_argument('--list', dest='config_list', action='store_true',
+                        default=False, help='list all files in the config')
 mgroup.add_argument('--get', type=str, dest='config_get',
                         help='get value: name', nargs=1,
                         metavar='name')
@@ -80,45 +76,4 @@ if  sys.argv[1] != 'config' and \
 args = parser.parse_args()
 
 dispatcher._dispatcher_dispatch(args)
-
-exit(0)
-
-
-#Set up where the file should go, will be saved to dest
-dest = os.getcwd()+'/'
-fileName, fileExtension = os.path.splitext(args.file)
-# If output is specified make it the destination file
-if args.output != None:
-    # If the output was absolute, retain it
-    if os.path.isabs(args.output):
-        dest = args.output
-    # If not add it to the cwd
-    else:
-        dest += args.output
-    # If the new output is a directory
-    if os.path.isdir(dest):
-        # Add an input file variation to it
-        if args.no_minify:
-            dest += fileName + '.o'
-        else:
-            dest += fileName + '.min'
-        if fileExtension != '':
-            dest += fileExtension
-# If not, add an input file variation to the cwd
-else:
-    if args.no_minify:
-        dest += fileName + '.o'
-    else:
-        dest += fileName + '.min'
-    if fileExtension != '':
-            dest += fileExtension
-# Check if the new file location is writable
-os.access(os.path.dirname(dest), os.W_OK) or die('destination is not writable')
-# Now ensure all directories to that file exist
-if not os.path.exists(os.path.dirname(dest)):
-    os.makedirs(os.path.dirname(dest))
-
-
-
-compiler._compile(args.file,dest,args.rebuild)
 
