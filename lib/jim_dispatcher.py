@@ -13,6 +13,7 @@
 # 
 
 import jim_config as config
+import jim_cache as cache
 
 # Print and error message and exit
 def _dispatcher_error(message):
@@ -37,13 +38,18 @@ def _dispatcher_config(args):
     elif args.config_reset != None:
         config._global_reset_setting(args.config_reset[0])
 
-    print "config"
-    print args
-
 # Dispatch to caching
 def _dispatcher_cache(args):
-    print "cache"
-    print args
+    if args.cache_clear:
+        cache._cache_clear()
+    elif args.cache_rebuild:
+        cache._cache_rebuild()
+    elif args.cache_list:
+        cache._cache_list()
+    elif args.cache_add != None:
+        cache._cache_add(args.cache_add[0])
+    elif args.cache_remove != None:
+        cache._cache_remove(args.cache_remove[0])
 
 #Dispatch to making
 def _dispatcher_make(args):

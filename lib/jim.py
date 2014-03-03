@@ -50,6 +50,12 @@ mgroup.add_argument('--clear', dest='cache_clear', action='store_true',
                         default=False, help='clear the cache')
 mgroup.add_argument('--rebuild', dest='cache_rebuild', action='store_true',
                         default=False, help='rebuild the cache')
+mgroup.add_argument('--list', dest='cache_list', action='store_true',
+                        default=False, help='list all files in the cache')
+mgroup.add_argument('--add', dest='cache_add', type=str,
+                        nargs=1, metavar='file', help='add a remote file to the cache')
+mgroup.add_argument('--remove', dest='cache_remove', type=str,
+                        nargs=1, metavar='file', help='remove a remote file from to the cache')
 sp_cache.set_defaults(which="cache")
 
 sp_make = sp.add_parser('make', help='compile a file')
