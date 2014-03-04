@@ -44,14 +44,16 @@ def _dispatcher_config(args):
 def _dispatcher_cache(args):
     if args.cache_clear:
         cache._cache_clear()
-    elif args.cache_rebuild:
-        cache._cache_rebuild()
     elif args.cache_list:
         cache._cache_list()
     elif args.cache_add != None:
         cache._cache_add(args.cache_add[0])
     elif args.cache_remove != None:
         cache._cache_remove(args.cache_remove[0])
+    elif args.cache_rebuild != None:
+        cache._cache_rebuild_one(args.cache_rebuild)
+    else:
+        cache._cache_rebuild()
 
 # Get a variant of the input file
 def _dispatcher_get_input_variant(args):

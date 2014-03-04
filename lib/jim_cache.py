@@ -94,6 +94,17 @@ def _cache_rebuild():
         _cache_restore(_file,data[_file])
     print 'cache was rebuilt'
 
+# Rebuilds only one file
+def _cache_rebuild_one(_file):
+    # Read in cache data
+    data = _cache_read()
+    # Restore every file in the cache
+    if _file in data:
+        _cache_restore(_file,data[_file])
+    else:
+        _cache_error('file not found in cache')
+    print _file+' was rebuilt'
+
 # Clears the entire cache
 def _cache_clear():
     folder = '/var/cache/jim/'
@@ -106,15 +117,14 @@ def _cache_clear():
 
 # Adds a specific file to the cache
 def _cache_add(_file):
-    _cache_get(_file,True)
+    _cache_get(_file,False)
 
 # Removes a specific file from the cache
 def _cache_remove(_file):
     # Read in cache data
     data = _cache_read()
     if not _file in data:
-        print 'file not found in cache'
-        return
+        _cache_error('file not found in cache')
     os.unlink(data[_file])
     del data[_file]
     # Save new cache data

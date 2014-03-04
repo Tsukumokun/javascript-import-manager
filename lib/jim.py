@@ -44,8 +44,9 @@ sp_cache = sp.add_parser('cache', help='manage cache')
 mgroup = sp_cache.add_mutually_exclusive_group(required=True)
 mgroup.add_argument('--clear', dest='cache_clear', action='store_true',
                         default=False, help='clear the cache')
-mgroup.add_argument('--rebuild', dest='cache_rebuild', action='store_true',
-                        default=False, help='rebuild the cache')
+mgroup.add_argument('--rebuild', dest='cache_rebuild', type=str,
+                        nargs='?', metavar='file', default='==',
+                        help='rebuild the file, if none specified the whole cache')
 mgroup.add_argument('--list', dest='cache_list', action='store_true',
                         default=False, help='list all files in the cache')
 mgroup.add_argument('--add', dest='cache_add', type=str,
