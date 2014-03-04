@@ -9,11 +9,13 @@ For more information visit the [Creative Commons Website]
 
 Website
 ----------
-
+http://tsukumokun.github.io/javascript-import-manager
 
 How to use
 ----------
+jim file.js
 
+(See website)
 
 How to report bugs
 ----------
