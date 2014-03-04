@@ -68,7 +68,8 @@ sp_make.add_argument('-o', '--output', metavar='output', dest='output', type=str
 sp_make.set_defaults(which='make')
 
 # Set default subparser
-if  sys.argv[1] != 'config' and \
+if  len(sys.argv) > 1 and \
+    sys.argv[1] != 'config' and \
     sys.argv[1] != 'cache' and  \
     sys.argv[1] != 'make' and \
     not sys.argv[1].startswith('-'):
