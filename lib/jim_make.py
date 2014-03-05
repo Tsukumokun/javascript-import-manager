@@ -73,7 +73,7 @@ def _compile_recurse(in_file,out_fd,force,nocache,loop_set):
     #  a string object to be split by line
     data = None
     try:
-        if no is_nocache:
+        if not is_nocache:
             with open(in_file, 'r') as fp:
                 data = fp.read()
         else:
@@ -93,7 +93,7 @@ def _compile_recurse(in_file,out_fd,force,nocache,loop_set):
         else:
             nset = Set()
             nset.update(loop_set)
-            _compile_recurse(_compile_import(line),out_fd,force,nset)
+            _compile_recurse(_compile_import(line),out_fd,force,is_nocache,nset)
     # Write out that the file has completed and been included
     out_fd.write('//End File: '+in_file+'\n')
 
