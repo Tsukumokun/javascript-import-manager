@@ -16,27 +16,98 @@ import os
 import re
 from sets import Set
 import urllib
+import uuid
 
 import jim_cache as cacher
 
-repeat_set = Set();
+repeat_set = Set()
+
+package_set = Set()
+package_dict = {}
 
 def _compile_error(message):
     print('jim: compile error: ' + message)
     exit(1)
 
-# Checks the line where an import was detected
-def _compile_import(line):
+# Check for repeated or looping dependencies
+def _compile_data(_file,nocache):
+    data = None
+    try:
+        if not nocache:
+            with open(_file, 'r') as fp:
+                data = fp.read()
+        else:
+            with urllib.urlopen(_file) as fp:
+                data = fp.read()
+    except:
+        _compile_error('failed to read file: '+in_file)
+    return data
+
+# Check for import or include
+def _compile_check(line,out_fd,nocache,force):
+    # Check for import
+    vals = re.match("^ *(//|/\*|\*)? *import +(?P<c>(nocache:)?)(?P<f>[^ ]+)( +as +(?P<a>[^ ]+))? *$",line)
+    if vals != None:
+        if vals.group('c') != None:
+            nocache = True
+        _as = vals.group('a')
+        if _as == None:
+            _as = os.path.splitext(\
+                  os.path.basename(\
+                  vals.group('f')))[0]\
+                  .replace('-','_')
+        _compile_import(vals.group('f'),out_fd,_as,nocache,force)
+        return ''
+    # Check for include
+    vals = re.match("^ *(//|/\*|\*)? *include +(?P<c>(nocache:)?)(?P<f>[^ ]+) *$",line)
+    if vals != None:
+        if vals.group('c') != None:
+            nocache = True
+        _compile_include(_file,out_fd,nocache,force)
+        return ''
+    # Otherwise return the line to be printed
+    return line+'\n'
+
+# Includes a file without making it a module
+def _compile_include(_file,out_fd,nocache,force):
+    pass
+
+# Imports a file as a module
+def _compile_import(_file,out_fd,_as,nocache,force):
+    # Buffer file to check for imports
+    _buffer = ''
+    for line in _compile_data(_file,nocache):
+        _buffer += _compile_check(line)
+    # Check for existing package alias
+    if _as in package_set:
+        _compile_error('package with this name already exists: '+_as)
+    package_set.add(_as)
+    # Check for existing package
+    if _file in package_dict:
+        out_fd.write('var '+_as+' = '+package_dict[_file])
+    else:
+    package = '_'+uuid.uuid4().hex
+    # Add the package closure
+    out_fd.write('(function('+package+'){\n')
+    # Put the file in place
+    out_fd.write(_buffer)
+    # End the package closure
+    out_fd.write('}('+package+'={}))\n')
+    # Alias to the given name
+    out_fd.write('var '+_as+' = '+package+'\n')
+    return
     # Attempt to match the import for syntax
-    vals = re.match("^[ ]*(//|/\*|\*)?[ ]*@[a-zA-Z]+( *?\((['](?P<f>([^']|\\')+)[']|[\"](?P<g>([^\"]|\\\")+)[\"]|(?P<h>([^\()'\"]|\\\"|\\')+))[\)]| +(['](?P<i>([^']|\\')+)[']|[\"](?P<j>([^\"]|\\\")+)[\"])) *$",line).groupdict().values()
-    for val in vals:
-        if val != None:
-            return val
+    #vals = re.match("^[ ]*(//|/\*|\*)?[ ]*@[a-zA-Z]+( *?\((['](?P<f>([^']|\\')+)[']|[\"](?P<g>([^\"]|\\\")+)[\"]|(?P<h>([^\()'\"]|\\\"|\\')+))[\)]| +(['](?P<i>([^']|\\')+)[']|[\"](?P<j>([^\"]|\\\")+)[\"])) *$",line).groupdict().values()
+    vals = re.match("^ *(//|/\*|\*)? *import +(?P<c>(nocache:)?)(?P<f>[^ ]+)( +as +(?P<a>[^ ]+))? *$",line)
+
+    #for val in vals:
+    #    if val != None:
+    #        return val
     # If nothing was found alert a compile error
     _compile_error('import syntax error: '+line)
 
 # Recursively build the output file
-def _compile_recurse(in_file,out_fd,force,nocache,loop_set):
+def _compile_recurse(in_file,out_fd,force,nocache,module,loop_set):
     # If the file is already in the set alert a compile error
     if in_file in loop_set:
         error = 'dependency loop encountered'
@@ -91,9 +162,7 @@ def _compile_recurse(in_file,out_fd,force,nocache,loop_set):
         # Otherwise recursively call this function
         #  to include the imported file
         else:
-            nset = Set()
-            nset.update(loop_set)
-            _compile_recurse(_compile_import(line),out_fd,force,is_nocache,nset)
+            _compile_recurse(_compile_import(line),out_fd,force,is_nocache,Set(loop_set))
     # Write out that the file has completed and been included
     out_fd.write('//End File: '+in_file+'\n')
 
