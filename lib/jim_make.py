@@ -30,10 +30,11 @@ def _compile_error(message):
     exit(1)
 
 # Check for repeated or looping dependencies
-def _compile_data(_file,nocache):
+def _compile_data(_file,nocache,force):
     data = None
     try:
         if not nocache:
+            _file = cacher._cache_get(_file,force)
             with open(_file, 'r') as fp:
                 data = fp.read()
         else:
@@ -44,7 +45,7 @@ def _compile_data(_file,nocache):
     return data
 
 # Check for import or include
-def _compile_check(line,out_fd,nocache,force):
+def _compile_check(line,out_fd,nocache,force,loop_set):
     # Check for import
     vals = re.match("^ *(//|/\*|\*)? *import +(?P<c>(nocache:)?)(?P<f>[^ ]+)( +as +(?P<a>[^ ]+))? *$",line)
     if vals != None:
@@ -56,28 +57,41 @@ def _compile_check(line,out_fd,nocache,force):
                   os.path.basename(\
                   vals.group('f')))[0]\
                   .replace('-','_')
-        _compile_import(vals.group('f'),out_fd,_as,nocache,force)
+        _compile_import(vals.group('f'),out_fd,_as,nocache,force,Set(loop_set))
         return ''
     # Check for include
     vals = re.match("^ *(//|/\*|\*)? *include +(?P<c>(nocache:)?)(?P<f>[^ ]+) *$",line)
     if vals != None:
         if vals.group('c') != None:
             nocache = True
-        _compile_include(_file,out_fd,nocache,force)
+        _compile_include(vals.group('f'),out_fd,nocache,force,Set(loop_set))
         return ''
     # Otherwise return the line to be printed
     return line+'\n'
 
 # Includes a file without making it a module
-def _compile_include(_file,out_fd,nocache,force):
-    pass
+def _compile_include(_file,out_fd,nocache,force,loop_set):
+    # Check for loop
+    if _file in loop_set:
+        _compile_error('dependency loop encountered')
+    loop_set.add(_file)
+    # Check for a repeat
+    if _file in repeat_set:
+        return
+    repeat_set.add(_as)
+    for line in _compile_data(_file,nocache,force):
+        out_fd.write(_compile_check(line,out_fd,nocache,force,loop_set))
 
 # Imports a file as a module
-def _compile_import(_file,out_fd,_as,nocache,force):
+def _compile_import(_file,out_fd,_as,nocache,force,loop_set):
+    # Check for loop
+    if _file in loop_set:
+        _compile_error('dependency loop encountered')
+    loop_set.add(_file)
     # Buffer file to check for imports
     _buffer = ''
-    for line in _compile_data(_file,nocache):
-        _buffer += _compile_check(line)
+    for line in _compile_data(_file,nocache,force):
+        _buffer += _compile_check(line,out_fd,nocache,force,loop_set)
     # Check for existing package alias
     if _as in package_set:
         _compile_error('package with this name already exists: '+_as)
@@ -95,16 +109,6 @@ def _compile_import(_file,out_fd,_as,nocache,force):
     out_fd.write('}('+package+'={}))\n')
     # Alias to the given name
     out_fd.write('var '+_as+' = '+package+'\n')
-    return
-    # Attempt to match the import for syntax
-    #vals = re.match("^[ ]*(//|/\*|\*)?[ ]*@[a-zA-Z]+( *?\((['](?P<f>([^']|\\')+)[']|[\"](?P<g>([^\"]|\\\")+)[\"]|(?P<h>([^\()'\"]|\\\"|\\')+))[\)]| +(['](?P<i>([^']|\\')+)[']|[\"](?P<j>([^\"]|\\\")+)[\"])) *$",line).groupdict().values()
-    vals = re.match("^ *(//|/\*|\*)? *import +(?P<c>(nocache:)?)(?P<f>[^ ]+)( +as +(?P<a>[^ ]+))? *$",line)
-
-    #for val in vals:
-    #    if val != None:
-    #        return val
-    # If nothing was found alert a compile error
-    _compile_error('import syntax error: '+line)
 
 # Recursively build the output file
 def _compile_recurse(in_file,out_fd,force,nocache,module,loop_set):
@@ -170,7 +174,7 @@ def _compile_recurse(in_file,out_fd,force,nocache,module,loop_set):
 def _compile_make(in_file,out_file,force,nocache):
     repeat_set = Set()
     with open(out_file, 'w') as fp:
-        _compile_recurse(in_file,fp,force,nocache,Set())
+        _compile_include(in_file,fp,nocache,force,Set())
 
 # Minify the input file inplace using yui
 def _compile_minify(_file):
